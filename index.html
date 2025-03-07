@@ -1,0 +1,823 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QR-Scandle</title>
+
+    <!-- LIBRARY TO HELP CLIENT SIDE CODE EXECUTION, AS I HAVE TO HOST IT ON GITHUB -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+
+    <link rel="shortcut icon" href="dev-bar.png" type="image/x-icon">
+
+    <!-- SEO TAGS -->
+    <meta name="title" content="QR Code Generator - Create QR Codes for URLs, Text, Email, and More">
+    <meta name="description" content="Generate QR codes instantly for URLs, text, email, phone, SMS, WiFi, vCard, location, and more. A free and easy-to-use QR code generator built with HTML, CSS, and JavaScript.">
+    <meta name="keywords" content="QR code generator, create QR code, free QR code, QR code for URL, QR code for text, QR code for email, QR code for phone, 
+            QR code for SMS, QR code for WiFi, QR code for vCard, QR code for location, 
+            HTML QR code generator, JavaScript QR code generator">
+    <meta name="author" content="Abdul Ahad">
+    <meta name="robots" content="index, follow">
+    <meta name="language" content="English">
+    <meta name="revisit-after" content="1 day">
+
+    <link rel="canonical" href="https://yourwebsite.com/">
+
+
+    <!-- HEADER STYLING -->
+    <style>
+        
+        *{
+            margin: 0;
+            padding: 0;
+        }
+
+        p {
+            font-size: 20px;
+            font-weight: bolder;
+        }
+
+        /* Header Styling */
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            top: 0;
+            position: sticky;
+            background: linear-gradient(43deg, rgb(14, 49, 120) 0%, #34A853 46%, #ffbf00 100%);
+            padding: 15px;
+            /* border-radius: 6px; */
+            z-index: 1000; /* issy sub se uper rkho bai */
+        }
+
+        /* Day-Night Toggle Button */
+        .theme-switch {
+            width: 110px;
+            height: 50px;
+            background-color: #ffffff;
+            border-radius: 30px;
+            box-shadow: inset 0 0 5px 4px rgba(255, 255, 255, 1),
+                inset 0 0 20px 1px rgba(0, 0, 0, 0.488), 10px 20px 30px rgba(0, 0, 0, 0.096),
+                inset 0 0 0 3px rgba(0, 0, 0, 0.3);
+            display: flex;
+            align-items: center;
+            cursor: pointer;
+            position: relative;
+            transition: transform 0.4s;
+        }
+
+        /* 3-d hover animation */
+        .theme-switch:hover {
+            -webkit-transform: perspective(100px) rotateX(5deg) rotateY(-5deg);
+            transform: perspective(100px) rotateX(5deg) rotateY(-5deg);
+        }
+
+        /* Toggle Effect */
+        .theme-switch::before {
+            content: "";
+            position: absolute;
+            width: 35px;
+            height: 35px;
+            background: linear-gradient(130deg, #757272 10%, #ffffff 11%, #726f6f 62%);
+            border-radius: 50%;
+            top: 10px;
+            left: 10px;
+            box-shadow: 0 2px 1px rgba(0, 0, 0, 0.3), 10px 10px 10px rgba(0, 0, 0, 0.3);
+            transition: 0.4s;
+        }
+
+        /* Dark Mode */
+        body.dark-mode {
+            background-color: #000;
+        }
+
+        body.dark-mode header{
+            background: linear-gradient(43deg, #0A1F3E 0%, #1E3A2F 46%, #D4A017 100%);
+        }
+
+        body.dark-mode footer{
+            background: linear-gradient(43deg, #0A1F3E 0%, #1E3A2F 46%, #D4A017 100%);
+        }
+
+        body.dark-mode #master-dev > div{
+            background: linear-gradient(43deg, #0A1F3E 0%, #1E3A2F 46%, #D4A017 100%);
+        }
+
+        /* body.dark-mode{
+            background: linear-gradient(43deg, #0A1F3E 0%, #1E3A2F 46%, #D4A017 100%);
+        } */
+
+        /* Dark mode styles */
+        body.dark-mode h3{
+            color: #34A853;
+        }
+        body.dark-mode ul li {
+            background: linear-gradient(315deg, #000000 0%, #414141 70%);
+            color: #E0E0E0;
+        }
+
+        body.dark-mode ul li:hover {
+            background: linear-gradient(315deg, #1E3A2F 0%, #facc36 70%);
+            color: #FFFFFF;
+            transform: translateX(10px);
+            box-shadow: 4px 4px 10px rgba(255, 255, 255, 0.1);
+        }
+
+        body.dark-mode p {
+            color: white;
+        }
+
+        body.dark-mode h3:hover {
+            color: #ffdd57;
+            transform: translateY(-2px);
+            text-shadow: 3px 3px 6px rgba(255, 255, 255, 0.4);
+        }
+
+        body.dark-mode #lower_parts{
+            background: #000;
+        }
+
+        body.dark-mode .book{
+            
+            color: #E0E0E0;
+        }
+        body.dark-mode .cover{
+            background: linear-gradient(43deg, #0A1F3E 0%, #1E3A2F 46%, #D4A017 100%);
+            color: #E0E0E0;
+        }
+
+        /* When toggled */
+        .theme-switch.active::before {
+            left: 70px;
+            background: linear-gradient(315deg, #000000 0%, #414141 70%);
+        }
+
+        header h1{
+            font-size: 2rem;
+            color: rgb(255, 199, 45);
+            font-family: Cambria, Cochin, Georgia, Times, 'Times New Roman', serif;
+        }
+
+        /* Mobile size */
+        @media (max-width: 768px) {
+            .theme-switch {
+                width: 80px;
+                height: 40px;
+            }
+
+            .theme-switch::before {
+                width: 30px;
+                height: 30px;
+                top: 5px;
+                left: 5px;
+            }
+
+            .theme-switch.active::before {
+                left: 43px;
+            }
+
+            header h1{
+                font-size: 1.5rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .theme-switch {
+                width: 60px;
+                height: 30px;
+            }
+
+            .theme-switch::before {
+                width: 20px;
+                height: 20px;
+                top: 5px;
+                left: 5px;
+            }
+
+            .theme-switch.active::before {
+                left: 24px;
+            }
+
+            header h1{
+                font-size: 1.2rem;
+            }
+        }
+    </style>
+
+    <!-- GENERAL STYLING -->
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: black;;
+            margin: 0;
+            box-sizing: border-box;
+            color: white ;
+        }
+    </style>
+
+    <!-- SCROLL BAR DESIGN -->
+    <style>
+        /* addign a cursor */
+        * {
+            cursor:-moz-grabbing;
+        }
+
+        /* Styling the scroll wheel */
+        body {
+            overflow-y: scroll;
+            scrollbar-width: thin;
+            scrollbar-color: rgb(50, 164, 58) rgb(200, 80, 192);
+            scroll-behavior: smooth;
+        }
+
+        /* Chrome, Edge, Safari */
+        ::-webkit-scrollbar{
+            cursor: pointer;
+            width: 15px; /* Thin scrollbar */
+            border-radius: 5px;
+            scroll-behavior: smooth;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            cursor:pointer;
+            background-color: rgb(66, 248, 78);
+            border-radius: 4px;
+            scroll-behavior: smooth;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: rgb(65, 88, 208);
+            scroll-behavior: smooth;
+        }
+    </style>
+
+    <!-- FOOTER SECTION -->
+    <style>
+
+        /* Footer */
+        footer {
+            background: linear-gradient(43deg, rgb(14, 49, 120) 0%, #34A853 46%, #ffbf00 100%);
+            text-align: center;
+            padding: 25px;
+            /* border-radius: 4px; */
+            display: flex;
+            justify-content: space-around;
+        }
+
+        /* Footer Styling */
+        .footer {
+            display: block;
+            justify-content: space-around;
+            color: white;
+            text-align: center;
+            padding: 10px;
+            font-family: Arial, sans-serif;
+        }
+    
+        
+
+    </style>
+
+    <!-- CURSOR COLOR SELECTION CHANGE -->
+    <style>
+        ::selection {
+            background-color: rgb(255, 204, 112);
+            color: #333;
+        }
+
+        /* For webkit browsers (Chrome, Safari) */
+        ::-moz-selection {
+            background-color: rgb(255, 204, 112);
+            color: #333;
+        }
+
+        /* For Firefox */
+        ::selection {
+            background-color: rgb(255, 204, 112);
+            color: #333;
+        }
+
+    </style>
+
+    <!-- MASTER BRANCH STYLING -->
+    <style>
+
+        *{
+            margin: 0;
+            padding: 0;
+        }
+
+        /* Styling the main container */
+        #master-dev {
+            display: flex;
+            justify-content: center;  
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+            padding: 20px;
+        }
+
+        #master-dev > div {
+            color: #dadbdb;
+            flex: 1 1 calc(30% - 20px);
+            max-width: calc(25% - 23px);
+            min-width: 60px;
+            height: 60px;
+            padding: 25px;
+            background: linear-gradient(43deg, rgb(14, 49, 120) 0%, #34A853 46%, #ffbf00 100%);
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(15, 124, 240, 0.3);
+            color: white;
+            font-size: 24px;
+            font-weight: bold;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            text-align:center;
+            transition: transform 0.1s ease-out;
+        }
+
+        #master-dev > div:hover {
+            transform: scale(1.002);
+            box-shadow: 0 20px 50px rgb(255, 194, 26);   
+        }
+
+
+        /* Media Queries */
+        @media (max-width: 900px) {
+            #master-dev > div {
+                flex: 1 1 calc(50% - 15px);
+                max-width: calc(50% - 25px);
+            }
+        }
+
+        @media (max-width: 600px) {
+            #master-dev > div {
+                flex: 1 1 90%;
+                max-width: 90%;
+            }
+        }
+
+        #master-dev > div a {
+            display: block;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            height: 100%;
+            text-decoration: none;
+            color: white;
+        }
+
+        /* Mobile size */
+        @media (max-width: 768px) {
+            .theme-switch {
+                width: 80px;
+                height: 40px;
+            }
+
+            .theme-switch::before {
+                width: 30px;
+                height: 30px;
+                top: 5px;
+                left: 5px;
+            }
+
+            .theme-switch.active::before {
+                left: 25px;
+            }
+
+            header h1{
+                font-size: 1.5rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .theme-switch {
+                width: 60px;
+                height: 30px;
+            }
+
+            .theme-switch::before {
+                width: 20px;
+                height: 20px;
+                top: 5px;
+                left: 5px;
+            }
+
+            .theme-switch.active::before {
+                left: 35px;
+            }
+
+            header h1{
+                font-size: 1.2rem;
+            }
+        }
+
+    </style>
+
+    <!-- INPUT FORMS STYLING -->
+    <style>
+        .container {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            width: 350px;
+        }
+        h2 {
+            margin-bottom: 15px;
+        }
+        input, select, button {
+            width: 88%;
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 5px;
+            border: 1px solid #ddd;
+            font-size: 16px;
+        }
+        button {
+            background-color: #28a745;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #218838;
+        }
+        .qr-preview {
+            margin-top: 20px;
+        }
+    </style>
+
+    <!-- FORM STYLING -->
+    <style>
+        body{ 
+            font-family: Arial, sans-serif; 
+            text-align: center; 
+        }
+        .modal{ 
+            display: none; 
+            position: fixed; 
+            top: 50%; 
+            left: 50%; 
+            transform: translate(-50%, -50%); 
+            background: white; 
+            padding: 20px; 
+            border-radius: 5px; 
+            box-shadow: 0 0 10px rgba(0,0,0,0.3); 
+        }
+        .overlay{ 
+            display: none; 
+            position: fixed; 
+            top: 0; 
+            left: 0; 
+            width: 100%; 
+            height: 100%; 
+            background: rgba(0,0,0,0.5); 
+        }
+        .close{ 
+            cursor: pointer; 
+            color: red; 
+            float: right; 
+        }
+    </style>
+
+
+</head>
+<body>
+
+    <!-- HEADER -->
+    <header>
+        <img src="qr-code.gif" alt="Logo" height="5%" width="5%" style="border-radius: 20%;">
+        <h1>𝑸𝑹 𝑪𝒐𝒅𝒆 𝑮𝒆𝒏𝒆𝒓𝒂𝒕𝒐𝒓.</h1>
+        <div class="theme-switch" onclick="toggleTheme()"></div>
+    </header>
+
+
+    <!-- NAVIGATION ELEMENTS -->
+    <div id="master-dev">
+        <!-- 1 -->
+        <div onclick="DISPLAY_FORM('url')">
+            <a href="#">URL</a>
+        </div>
+        <!-- 2 -->
+        <div onclick="DISPLAY_FORM('text')">
+            <a href="#">Text</a>
+        </div>
+        <!-- 3 -->
+        <div onclick="DISPLAY_FORM('email')">
+            <a href="#">Email</a>
+        </div>
+        <!-- 4 -->
+        <div onclick="DISPLAY_FORM('phone')">
+            <a href="#">Phone</a>
+        </div>
+        <!-- 5 -->
+        <div onclick="DISPLAY_FORM('sms')">
+            <a href="#">SMS</a>
+        </div>
+        <!-- 6 -->
+        <div onclick="DISPLAY_FORM('vcard')">
+            <a href="#">vCard</a>
+        </div>
+        <!-- 7 -->
+        <div onclick="DISPLAY_FORM('location')">
+            <a href="#">Location</a>
+        </div>
+        <!-- 8 -->
+        <div onclick="DISPLAY_FORM('wifi')">
+            <a href="#">WiFi</a>
+        </div>
+        <!-- 9 -->
+        <div onclick="DISPLAY_FORM('mecard')">
+            <a href="#">MeCard</a>
+        </div>
+        <!-- 10 -->
+        <div onclick="DISPLAY_FORM('event')">
+            <a href="#">Event</a>
+        </div>
+    </div>
+
+    <div class="overlay" id="overlay" onclick="HIDDEN()"></div>
+    
+    <!-- SINGLE DYNAMIC FORM -->
+    <div class="modal" id="modal">
+        <span class="close" onclick="HIDDEN()">&times;</span>
+        <h2>Generate QR Code</h2>
+        <div id="dynamicForm"></div>
+        <label for="colorInput">Select QR Code Color:</label>
+        <input type="color" id="colorInput">
+        <button onclick="GEN_QR()">Generate QR</button>
+        <div id="qrcode"></div>
+        <button id="downloadQR" style="display: none;" onclick="DOWNLOAD_QR()">Download QR</button>
+        <button id="shareQR" style="display: none;" onclick="SHARE_QR()">Share QR</button>
+    </div>
+
+    <!-- FOOTER -->
+    <footer>
+        <p>&copy; <span>2025 <em>QR-SCANDLE</em> All rights reserved.</span></p>
+    </footer>
+
+    <script>
+
+        // DATA FIELDS TO BE DISPLAYED ON FORM.
+        function DISPLAY_FORM(type) {
+            
+            let formContent = "";
+            
+            switch(type){
+                case "url":{
+                    formContent = `<input type="text" id="qrInput" placeholder="Enter URL">`;
+                    break;
+                }
+                case "text":{
+                    formContent = `<input type="text" id="qrInput" placeholder="Enter Text">`;
+                    break;
+                }
+                case "email":{
+                    formContent = `<input type="text" id="emailTo" placeholder="Email Address">` +
+                                  `<input type="text" id="emailSubject" placeholder="Subject">` +
+                                  `<input type="text" id="emailBody" placeholder="Message">`;
+                    break;
+                }
+                case "phone":{
+                    formContent = `<input type="text" id="qrInput" placeholder="Enter Phone Number">`;
+                    break;
+                }
+                case "sms":{
+                    formContent = `<input type="text" id="smsNumber" placeholder="Phone Number">` +
+                                  `<input type="text" id="smsMessage" placeholder="Message">`;
+                    break;
+                }
+                case "wifi":{
+                    formContent = `<input type="text" id="wifiSSID" placeholder="WiFi Name">` +
+                                  `<input type="text" id="wifiPassword" placeholder="Password">` +
+                                  `<select id="wifiEncryption">` +
+                                  `<option value="WPA">WPA</option><option value="WEP">WEP</option><option value="nopass">None</option></select>`;
+                    break;
+                }
+                case "vcard":{
+                    formContent = `<input type="text" id="vcName" placeholder="Full Name">` +
+                                  `<input type="text" id="vcPhone" placeholder="Phone Number">` +
+                                  `<input type="text" id="vcEmail" placeholder="Email">`;
+                    break;
+                }
+                case "mecard":{
+                    formContent = `<input type="text" id="mecardName" placeholder="Name">` +
+                                  `<input type="text" id="mecardPhone" placeholder="Phone">`;
+                    break;
+                }
+                case "location":{
+                    formContent = `<input type="text" id="lat" placeholder="Latitude">` +
+                                  `<input type="text" id="lon" placeholder="Longitude">`;
+                    break;
+                }
+                case "event":{
+                    formContent = `<input type="text" id="eventTitle" placeholder="Event Title">` +
+                                  `<input type="date" id="eventDate" placeholder="YYYY-MM-DD">`;
+                    break;
+                }
+            }
+            document.getElementById("dynamicForm").innerHTML = formContent;
+            document.getElementById("qrcode").innerHTML = "";
+            document.getElementById("overlay").style.display = "block";
+            document.getElementById("modal").style.display = "block";
+        }
+
+
+        // JUST HIDE BY DEFAULT...
+        function HIDDEN(){
+            document.getElementById("overlay").style.display = "none";
+            document.getElementById("modal").style.display = "none";
+        }
+
+
+        // GENERATE QR CODE USING QRENCODE LIBRARY
+        function GEN_QR(){
+            let data = "";
+            let color = document.getElementById("colorInput").value.replace("#", "");
+            let form = document.getElementById("dynamicForm").firstElementChild;
+            
+            if(!form){
+                return alert("Please select a QR type!");
+            }
+            
+            if(form.id === "qrInput"){
+                data = form.value;
+            }
+            else if(form.id === "emailTo"){
+                data = `mailto:${document.getElementById("emailTo").value}`;
+            }
+            else if(form.id === "smsNumber"){
+                data = `sms:${document.getElementById("smsNumber").value}?body=${encodeURIComponent(document.getElementById("smsMessage").value)}`;
+            }
+            else if(form.id === "wifiSSID"){
+                data = `WIFI:S:${document.getElementById("wifiSSID").value};
+                T:${document.getElementById("wifiEncryption").value};
+                P:${document.getElementById("wifiPassword").value};;`;
+            }
+            else if(form.id === "vcName"){
+                data = `BEGIN:VCARD\nFN:${document.getElementById("vcName").value}\n
+                TEL:${document.getElementById("vcPhone").value}\n
+                EMAIL:${document.getElementById("vcEmail").value}\n
+                END:VCARD`;
+            }
+            else if(form.id === "lat"){
+                data = `geo:${document.getElementById("lat").value},${document.getElementById("lon").value}`;
+            }
+            else if(form.id === "urlInput"){
+                data = document.getElementById("urlInput").value;
+            }
+            else if(form.id === "textInput"){
+                data = document.getElementById("textInput").value;
+            }
+            else if(form.id === "phoneNumber"){
+                data = `tel:${document.getElementById("phoneNumber").value}`;
+            }
+            else if(form.id === "eventTitle") {
+                const eventTitle = document.getElementById("eventTitle").value;
+                const eventDate = document.getElementById("eventDate").value;
+                data = `BEGIN:EVENT\nSUMMARY:${eventTitle}\nDTSTART:${eventDate}\nEND:EVENT`;
+            }
+            else if(form.id === "mecardName") {
+                const mecardName = document.getElementById("mecardName").value;
+                const mecardPhone = document.getElementById("mecardPhone").value;
+                data = `MECARD:N:${mecardName};TEL:${mecardPhone};;`;
+            }
+
+            if(!data){
+                return alert("Please enter valid data!");
+            }
+
+            document.getElementById("qrcode").innerHTML = "";
+            let qr = new QRCode(document.getElementById("qrcode"), {
+                text: data,
+                width: 300,
+                height: 300,
+                colorDark: "#" + color,
+                correctLevel: QRCode.CorrectLevel.H
+            });
+
+            setTimeout(() => {
+                document.getElementById("downloadQR").style.display = "inline-block";
+                document.getElementById("shareQR").style.display = "inline-block";
+            }, 500);
+        }
+
+
+        // DOQNLOAD QR CODE [Not working]
+        function DOWNLOAD_QR() {
+            let qrCanvas = document.querySelector("#qrcode canvas");
+            if (!qrCanvas) {
+                alert("Please generate a QR code first!");
+                return;
+            }
+
+            let tempCanvas = document.createElement("canvas");
+            let ctx = tempCanvas.getContext("2d");
+
+            // Get actual size of the original QR code
+            tempCanvas.width = qrCanvas.width;
+            tempCanvas.height = qrCanvas.height;
+
+            ctx.drawImage(qrCanvas, 0, 0);
+
+            let link = document.createElement("a");
+            link.href = tempCanvas.toDataURL("image/png"); // High-quality PNG
+            link.download = "qrcode.png";
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+
+
+        // SHARE QR CODE [Not working]
+        function SHARE_QR() {
+            let qrCanvas = document.querySelector("#qrcode canvas");
+            if (!qrCanvas) {
+                alert("Please generate a QR code first!");
+                return;
+            }
+
+            qrCanvas.toBlob(blob => {
+                let file = new File([blob], "qrcode.png", { type: "image/png" });
+
+                if (navigator.canShare && navigator.canShare({ files: [file] })) {
+                    navigator.share({
+                        title: "QR Code",
+                        text: "Scan this QR Code!",
+                        files: [file]
+                    }).catch(err => console.log("Error sharing:", err));
+                } else {
+                    alert("Sharing not supported on this device.");
+                }
+            }, "image/png"); 
+        }
+
+    </script>
+
+
+    <!-- THEME TOGGLE -->
+    <script>
+        function toggleTheme() {
+            document.body.classList.toggle("dark-mode");
+            document.querySelector(".theme-switch").classList.toggle("active");
+        }
+
+        // document.addEventListener("contextmenu", function(event) {
+        //     event.preventDefault();
+        // });
+
+        // document.addEventListener("keydown", function(event) {
+        //     if (event.ctrlKey && (event.key === "u" || event.key === "s" || event.key === "i" || event.key === "j")) {
+        //         event.preventDefault();
+        //     }
+        //     if (event.key === "F12") {
+        //         event.preventDefault();
+        //     }
+        // });
+
+        // document.addEventListener("keydown", function(event) {
+        //     if (
+        //         (event.ctrlKey && event.shiftKey && (event.key === "I" || event.key === "J" || event.key === "C")) || // Ctrl+Shift+I/J/C
+        //         (event.ctrlKey && event.key === "U") || // Ctrl+U
+        //         (event.key === "F12") // F12
+        //     ) {
+        //         event.preventDefault();
+        //     }
+        // });
+    </script>
+
+
+    <!-- 3-D ROTATION. -->
+    <script>
+        document.querySelectorAll("#master-dev > div").forEach((card) => {
+            card.addEventListener("mousemove", (event) => {
+                let rect = card.getBoundingClientRect();
+                let x = event.clientX - rect.left;
+                let y = event.clientY - rect.top;
+                let centerX = rect.width / 2;
+                let centerY = rect.height / 2;
+
+                let rotateX = (centerY - y) / 8;
+                let rotateY = (x - centerX) / 8;
+
+                card.style.transform = `perspective(500px) rotateX(${rotateX}deg) rotateY(${rotateY}deg)`;
+            });
+
+            card.addEventListener("mouseleave", () => {
+                card.style.transition = "transform 0.3s ease-out";
+                card.style.transform = "perspective(500px) rotateX(0deg) rotateY(0deg)";
+                setTimeout(() => {
+                    card.style.transition = "";
+                }, 300);
+            });
+        });
+
+    </script>
+    
+
+</body>
+</html>
